@@ -1,0 +1,48 @@
+declare Ax Real
+input Ax
+
+declare Ay Real
+input Ay
+
+declare Bx Real
+input Bx
+
+declare By Real
+input By
+
+declare u Real
+input u
+
+declare v Real True 2
+assign v[0] Bx-Ax
+assign v[1] By-Ay
+
+declare n Real True 2
+assign n[0] -v[1]
+assign n[1] v[0]
+
+declare lnahoj Real
+assign lnahoj sqrt(n[0]^2+n[1]^2)
+
+declare lfahoj Real
+assign lfahoj sqrt(u^2-lnahoj^2)
+
+declare c Real
+assign c lfahoj/lnahoj
+
+declare q Real True 2
+assign q[0] n[0]*c
+assign q[1] n[1]*c
+
+declare cbod Real True 2
+assign cbod[0] Bx+q[0]
+assign cbod[1] By+q[1]
+
+declare dbod Real True 2
+assign dbod[0] Ax+q[0]
+assign dbod[1] Ay+q[1]
+
+output ToFixed(cbod[0],2)
+output ToFixed(cbod[1],2)
+output ToFixed(dbod[0],2)
+output ToFixed(dbod[1],2)
