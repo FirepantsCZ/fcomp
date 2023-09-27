@@ -1,7 +1,8 @@
-import xml.etree.ElementTree as ET
+#import xml.etree.ElementTree as ET
 import sys
 
-import regex
+import lxml.etree as ET
+
 
 OPERATION_DECLARATIONS = {
     "declare": [
@@ -41,7 +42,15 @@ OPERATION_DECLARATIONS = {
         {
             "name": "variable"
         }
-    ]
+    ],
+    "if": [
+        {
+            "name": "expression"
+        }
+    ],
+    "then": [],
+    "else": [],
+    "fi": []
 }
 
 TEMPLATE = """<?xml version="1.0"?>
@@ -121,7 +130,7 @@ with open(infile) as f:
     for line in user_input:
         print(line)
         #line = line.split(" ") 
-        line = parenthesis_split(line)
+        line = parenthesis_split(line.strip())
         print(line)
          
         operation = line[0]
@@ -129,8 +138,6 @@ with open(infile) as f:
             continue
 
         attributes = [e.strip() for e in line[1:]] 
-
-
 
         print(operation)
         print(attributes)
@@ -142,6 +149,8 @@ with open(infile) as f:
 
         # TODO temp solution for multi-tag operations
 
+        print(len(required_attributes))
+
         for i, e in enumerate(required_attributes):
             try:
                 values.update({required_attributes[i]["name"]: attributes[i]})
@@ -150,14 +159,31 @@ with open(infile) as f:
 
         print(values)
         
+        # ops that should not be translated directly
+        if operation not in ["fi", "else"]:
+            new_element = ET.Element(operation, values)
+            parent.append(new_element)
 
-        parent.append(ET.Element(operation, values))
-        if operation == "if":
-            parent.append(ET.Element("then"))
-            parent = parent.find("then")
 
+        if operation  == "if":
+            parent = new_element
+            #parent.append(ET.Element("then"))
+            #parent = parent.find("then")
+        
+        elif operation == "then":
+            parent = new_element
+
+        elif operation == "else":
+            print(parent.tag)
+            print(parent.getparent())
+            parent = parent.getparent()
+            new_element = ET.Element("else")
+            parent.append(new_element)
+            parent = new_element
+            
         elif operation == "fi":
-            parent = 
+            print(parent)
+            parent = parent.getparent().getparent()
 
 
 
