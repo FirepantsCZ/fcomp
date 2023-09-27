@@ -116,6 +116,7 @@ with open(infile) as f:
 
     # TODO specify main function
     body = root.find("function").find("body")
+    parent = body
 
     for line in user_input:
         print(line)
@@ -130,6 +131,7 @@ with open(infile) as f:
         attributes = [e.strip() for e in line[1:]] 
 
 
+
         print(operation)
         print(attributes)
 
@@ -138,6 +140,8 @@ with open(infile) as f:
 
         values = {}
 
+        # TODO temp solution for multi-tag operations
+
         for i, e in enumerate(required_attributes):
             try:
                 values.update({required_attributes[i]["name"]: attributes[i]})
@@ -145,8 +149,17 @@ with open(infile) as f:
                 values.update({required_attributes[i]["name"]: required_attributes[i]["default"]})
 
         print(values)
+        
 
-        body.append(ET.Element(operation, values))
+        parent.append(ET.Element(operation, values))
+        if operation == "if":
+            parent.append(ET.Element("then"))
+            parent = parent.find("then")
+
+        elif operation == "fi":
+            parent = 
+
+
 
     tree.write(outfile)
 
