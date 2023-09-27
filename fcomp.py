@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 import sys
 
+import regex
+
 OPERATION_DECLARATIONS = {
     "declare": [
         {
@@ -69,6 +71,29 @@ with open(outfile, "w") as f:
     f.write(TEMPLATE)
 
 
+def parenthesis_split(sentence,separator=" ",lparen="(",rparen=")"):
+    nb_brackets=0
+    sentence = sentence.strip(separator) # get rid of leading/trailing seps
+
+    l=[0]
+    for i,c in enumerate(sentence):
+        if c==lparen:
+            nb_brackets+=1
+        elif c==rparen:
+            nb_brackets-=1
+        elif c==separator and nb_brackets==0:
+            l.append(i)
+        # handle malformed string
+        if nb_brackets<0:
+            raise Exception("Syntax error")
+
+    l.append(len(sentence))
+    # handle missing closing parentheses
+    if nb_brackets>0:
+        raise Exception("Syntax error")
+
+
+    return([sentence[i:j].strip(separator) for i,j in zip(l,l[1:])])
 
 
 class Operation:
@@ -94,12 +119,16 @@ with open(infile) as f:
 
     for line in user_input:
         print(line)
-        line = line.split(" ")
+        #line = line.split(" ") 
+        line = parenthesis_split(line)
+        print(line)
+         
         operation = line[0]
         if operation.strip() == "":
             continue
 
-        attributes = [e.strip() for e in line[1:]]
+        attributes = [e.strip() for e in line[1:]] 
+
 
         print(operation)
         print(attributes)
@@ -123,4 +152,3 @@ with open(infile) as f:
 
 
         
-
