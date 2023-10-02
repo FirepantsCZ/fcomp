@@ -50,7 +50,31 @@ OPERATION_DECLARATIONS = {
     ],
     "then": [],
     "else": [],
-    "fi": []
+    "fi": [],
+    "for": [
+        {
+            "name": "variable"
+        },
+        {
+            "name": "start"
+        },
+        {
+            "name": "end"
+        },
+        {
+            "name": "direction"
+        },
+        {
+            "name": "step"
+        }
+    ],
+    "endfor": [],
+    "while": [
+        {
+            "name": "expression"
+        }
+    ],
+    "endwhile": []
 }
 
 TEMPLATE = """<?xml version="1.0"?>
@@ -113,7 +137,6 @@ class Operation:
 
 
 operations = [Operation(name, [attribute for attribute in attributes]) for name, attributes in OPERATION_DECLARATIONS.items()]
-print(operations)
 # TODO add syntax check
 
 # line structure: operation attr1, attr2, attr3...
@@ -128,10 +151,7 @@ with open(infile) as f:
     parent = body
 
     for line in user_input:
-        print(line)
-        #line = line.split(" ") 
         line = parenthesis_split(line.strip())
-        print(line)
          
         operation = line[0]
         if operation.strip() == "":
@@ -139,55 +159,49 @@ with open(infile) as f:
 
         attributes = [e.strip() for e in line[1:]] 
 
-        print(operation)
-        print(attributes)
-
         required_attributes = OPERATION_DECLARATIONS[operation]
-        print(required_attributes)
 
         values = {}
 
         # TODO temp solution for multi-tag operations
-
-        print(len(required_attributes))
 
         for i, e in enumerate(required_attributes):
             try:
                 values.update({required_attributes[i]["name"]: attributes[i]})
             except IndexError:
                 values.update({required_attributes[i]["name"]: required_attributes[i]["default"]})
-
-        print(values)
         
         # ops that should not be translated directly
-        if operation not in ["fi", "else"]:
+        if operation not in ["fi", "else", "endfor", "endwhile"]:
             new_element = ET.Element(operation, values)
             parent.append(new_element)
 
+        match operation:
+            case "if":
+                parent = new_element
+                
+            case "then":
+                parent = new_element
+                
+            case "else":
+                parent = parent.getparent()
+                new_element = ET.Element("else")
+                parent.append(new_element)
+                parent = new_element
+               
+            case "fi":
+                parent = parent.getparent().getparent()
+                
+            case "for":
+                parent = new_element
 
-        if operation  == "if":
-            parent = new_element
-            #parent.append(ET.Element("then"))
-            #parent = parent.find("then")
-        
-        elif operation == "then":
-            parent = new_element
+            case "endfor":
+                parent = parent.getparent()
 
-        elif operation == "else":
-            print(parent.tag)
-            print(parent.getparent())
-            parent = parent.getparent()
-            new_element = ET.Element("else")
-            parent.append(new_element)
-            parent = new_element
-            
-        elif operation == "fi":
-            print(parent)
-            parent = parent.getparent().getparent()
+            case "while":
+                parent = new_element
 
-
+            case "endwhile":
+                parent = parent.getparent()
 
     tree.write(outfile)
-
-
-        
