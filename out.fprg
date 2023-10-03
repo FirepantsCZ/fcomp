@@ -1,0 +1,15 @@
+<flowgorithm fileversion="3.0">
+    <attributes>
+        <attribute name="name" value=""/>
+        <attribute name="authors" value="paolo"/>
+        <attribute name="about" value=""/>
+        <attribute name="saved" value="2023-09-25 01:41:34 dop."/>
+        <attribute name="created" value="cGFvbG87RklaTEk7MjAyMy0wOS0yNTswMTozNzo0MiBkb3AuOzI0MTc="/>
+        <attribute name="edited" value="cGFvbG87RklaTEk7MjAyMy0wOS0yNTswMTo0MTozNCBkb3AuOzE7MjUyMQ=="/>
+    </attributes>
+    <function name="Main" type="None" variable="">
+        <parameters/>
+        <body>
+        <declare name="startAh,startAm,lengthAh,lengthAm,startBh,startBm,lengthBh,lengthBm,startA,startB,lengthA,lengthB,endA,endB" type="Integer" array="False" size=""/><input variable="startAh"/><input variable="startAm"/><input variable="lengthAh"/><input variable="lengthAm"/><input variable="startBh"/><input variable="startBm"/><input variable="lengthBh"/><input variable="lengthBm"/><if expression="(startAh &lt; 4)"><then><assign variable="startAh" expression="(startAh+24)"/></then><else/></if><if expression="(startBh &lt; 4)"><then><assign variable="startBh" expression="(startBh+24)"/></then><else/></if><assign variable="startA" expression="(startAh*60)+startAm"/><assign variable="startB" expression="(startBh*60)+startBm"/><assign variable="lengthA" expression="(lengthAh*60)+lengthAm"/><assign variable="lengthB" expression="(lengthBh*60)+lengthBm"/><assign variable="endA" expression="(startA+lengthA)"/><assign variable="endB" expression="(startB+lengthB)"/><if expression="(endA &lt; startB)"><then><output expression="(&quot;doporuceni: v pohode&quot;)" newline="True"/></then><else><if expression="(endB &lt; endA)"><then><output expression="(&quot;doporuceni: to nedas&quot;)" newline="True"/></then><else><output expression="(&quot;doporuceni: neuvidis &quot; &amp; endA-startB &amp; &quot; minut&quot;)" newline="True"/></else></if></else></if></body>
+    </function>
+</flowgorithm>

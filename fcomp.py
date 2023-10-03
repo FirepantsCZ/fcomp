@@ -141,6 +141,7 @@ operations = [Operation(name, [attribute for attribute in attributes]) for name,
 
 # line structure: operation attr1, attr2, attr3...
 with open(infile) as f:
+    # TODO declare multiple vars inline
     user_input = f.readlines()
 
     tree = ET.parse(outfile)
@@ -154,8 +155,9 @@ with open(infile) as f:
         line = parenthesis_split(line.strip())
          
         operation = line[0]
-        if operation.strip() == "":
+        if operation.strip() == "" or operation.startswith("//"):
             continue
+
 
         attributes = [e.strip() for e in line[1:]] 
 

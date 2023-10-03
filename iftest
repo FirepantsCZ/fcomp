@@ -1,0 +1,49 @@
+declare startAh,startAm,lengthAh,lengthAm,startBh,startBm,lengthBh,lengthBm,startA,startB,lengthA,lengthB,endA,endB Integer
+
+
+input startAh
+input startAm
+
+input lengthAh
+input lengthAm
+
+
+input startBh
+input startBm
+
+input lengthBh
+input lengthBm
+
+
+if (startAh < 4)
+then
+    assign startAh (startAh+24)
+else
+fi
+
+if (startBh < 4)
+then
+    assign startBh (startBh+24)
+else
+fi
+
+assign startA (startAh*60)+startAm
+assign startB (startBh*60)+startBm
+
+assign lengthA (lengthAh*60)+lengthAm
+assign lengthB (lengthBh*60)+lengthBm
+
+assign endA (startA+lengthA)
+assign endB (startB+lengthB)
+
+if (endA < startB)
+then
+    output ("doporuceni: v pohode")
+else
+    if (endB < endA)
+    then
+        output ("doporuceni: to nedas")
+    else
+        output ("doporuceni: neuvidis " & endA-startB & " minut")
+    fi
+fi
