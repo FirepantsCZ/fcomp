@@ -74,7 +74,37 @@ OPERATION_DECLARATIONS = {
             "name": "expression"
         }
     ],
-    "endwhile": []
+    "endwhile": [],
+    "function": [
+        {
+            "name": "name"
+        },
+        {
+            "name": "type"
+        },
+        {
+            "name": "variable",
+            "default": ""
+        }
+    ],
+    "parameter": [
+        {
+            "name": "name"
+        },
+        {
+            "name": "type"
+        },
+        {
+            "name": "array",
+            "default": "false"
+        }
+    ],
+    "end": [],
+    "call":[
+        {
+            "name": "expression"
+        }
+    ]
 }
 
 TEMPLATE = """<?xml version="1.0"?>
@@ -148,8 +178,8 @@ with open(infile) as f:
     root = tree.getroot()
 
     # TODO specify main function
-    body = root.find("function").find("body")
-    parent = body
+    main_body = root.find("function").find("body")
+    parent = main_body
 
     for line in user_input:
         line = parenthesis_split(line.strip())
@@ -174,7 +204,7 @@ with open(infile) as f:
                 values.update({required_attributes[i]["name"]: required_attributes[i]["default"]})
         
         # ops that should not be translated directly
-        if operation not in ["fi", "else", "endfor", "endwhile"]:
+        if operation not in ["fi", "else", "endfor", "endwhile", "parameter", "function", "endfunction", "end"]:
             new_element = ET.Element(operation, values)
             parent.append(new_element)
 
@@ -197,6 +227,13 @@ with open(infile) as f:
             case "for":
                 parent = new_element
 
+            case "end":
+                if parent.getparent().tag == "function":
+                    parent = main_body
+
+                else:
+                    parent = parent.getparent()
+
             case "endfor":
                 parent = parent.getparent()
 
@@ -205,5 +242,21 @@ with open(infile) as f:
 
             case "endwhile":
                 parent = parent.getparent()
+
+            case "function":
+                new_element = ET.Element(operation, values)
+                new_element.append(ET.Element("parameters"))
+
+                new_body = ET.Element("body")
+                new_element.append(new_body)
+
+                root.append(new_element)
+                parent = new_body
+
+
+
+            case "parameter":
+               parent.getparent().xpath("parameters")[0].append(ET.Element(operation, values))
+
 
     tree.write(outfile)

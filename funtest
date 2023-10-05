@@ -1,0 +1,61 @@
+function InputReal Real userInput
+    parameter prompt String
+
+    output prompt
+    declare userInput Integer
+    input userInput
+end
+
+function ComputeImpactDistance Real distance
+    parameter velocity Real
+    parameter angle Real
+
+    declare distance Real
+    assign distance ((velocity^2)*Sin(2*((angle*pi)/180)))/9.81
+end
+
+function IsTargetHit Real remaining
+    parameter distance Real
+    parameter targetDistance Real
+    parameter targetSize Real
+
+    declare remaining Real
+
+    if distance<targetDistance-targetSize/2
+    then
+        assign remaining (targetDistance-targetSize/2)-distance
+    else
+        if distance>targetDistance+targetSize/2
+        then
+            assign remaining targetDistance-(distance-targetSize/2)
+        else
+            assign remaining 0
+        fi
+    fi
+end
+
+function OutputResult none
+    parameter targetDistance Real
+    parameter miss Real
+
+    if miss>0
+    then
+        output ("do cile ve vzdalenosti "&ToFixed(targetDistance,1)&" m chybi "&ToFixed(Abs(miss),1)&" m")
+    else
+        if miss<0
+        then
+            output ("cil ve vzdalenosti "&ToFixed(targetDistance,1)&" m byl prestrelen o "&ToFixed(Abs(miss),1)&" m")
+        else
+            output ("cil ve vzdalenosti "&ToFixed(targetDistance,1)&" m zasazen!")
+        fi
+    fi
+end
+
+declare velocity,angle,targetDistance,targetSize Real
+
+assign velocity InputReal("Zadej pocatecni rychlost: ")
+assign angle InputReal("Zadej uhel: ")
+assign targetDistance InputReal("Zadej vzdalenost k cili: ")
+assign targetSize InputReal("Zadej velikost cile: ")
+
+call OutputResult(targetDistance,IsTargetHit(ComputeImpactDistance(velocity,angle),targetDistance,targetSize))
