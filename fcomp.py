@@ -173,8 +173,8 @@ operations = [Operation(name, [attribute for attribute in attributes]) for name,
 with open(infile) as f:
     # TODO declare multiple vars inline
     user_input = f.readlines()
-
-    tree = ET.parse(outfile)
+    parser = ET.XMLParser(remove_blank_text=True)
+    tree = ET.parse(outfile,parser)
     root = tree.getroot()
 
     # TODO specify main function
@@ -258,5 +258,5 @@ with open(infile) as f:
             case "parameter":
                parent.getparent().xpath("parameters")[0].append(ET.Element(operation, values))
 
-
-    tree.write(outfile)
+    
+    tree.write(outfile, pretty_print=True)
