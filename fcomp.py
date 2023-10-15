@@ -80,7 +80,8 @@ OPERATION_DECLARATIONS = {
             "name": "name"
         },
         {
-            "name": "type"
+            "name": "type",
+            "default": "None"
         },
         {
             "name": "variable",
@@ -96,7 +97,7 @@ OPERATION_DECLARATIONS = {
         },
         {
             "name": "array",
-            "default": "false"
+            "default": "False"
         }
     ],
     "end": [],
