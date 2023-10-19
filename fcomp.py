@@ -3,6 +3,17 @@ import sys
 
 import lxml.etree as ET
 
+TYPES = [
+    "Integer",
+    "Real",
+    "String",
+    "Boolean"
+]
+
+BOOLEANS = [
+    "True",
+    "False"
+]
 
 OPERATION_DECLARATIONS = {
     "declare": [
@@ -10,11 +21,13 @@ OPERATION_DECLARATIONS = {
             "name": "name"
         },
         {
-            "name": "type"
+            "name": "type",
+            "enumerate": TYPES
         },
         {
             "name": "array",
-            "default": "False"
+            "default": "False",
+            "enumerate": BOOLEANS
         },
         {
             "name": "size",
@@ -35,7 +48,8 @@ OPERATION_DECLARATIONS = {
         },
         {
             "name": "newline",
-            "default": "True"
+            "default": "True",
+            "enumerate": BOOLEANS
         }
     ],
     "input": [
@@ -63,7 +77,8 @@ OPERATION_DECLARATIONS = {
         },
         {
             "name": "direction",
-            "default": "inc"
+            "default": "inc",
+            "enumerate": ["inc", "dec"]
         },
         {
             "name": "step",
@@ -83,7 +98,8 @@ OPERATION_DECLARATIONS = {
         },
         {
             "name": "type",
-            "default": "None"
+            "default": "None",
+            "enumerate": TYPES + ["None"]
         },
         {
             "name": "variable",
@@ -99,7 +115,8 @@ OPERATION_DECLARATIONS = {
         },
         {
             "name": "array",
-            "default": "False"
+            "default": "False",
+            "enumerate": BOOLEANS
         }
     ],
     "end": [],
@@ -184,7 +201,10 @@ with open(infile) as f:
     main_body = root.find("function").find("body")
     parent = main_body
 
-    for line in user_input:
+    for line_number, line in enumerate(user_input):
+        # we want line numbers to start at 1
+        line_number += 1
+
         line = parenthesis_split(line.strip())
          
         operation = line[0]
@@ -200,11 +220,15 @@ with open(infile) as f:
 
         # TODO temp solution for multi-tag operations
 
-        for i, e in enumerate(required_attributes):
+        for i, currentAttribute in enumerate(required_attributes):
             try:
-                values.update({required_attributes[i]["name"]: attributes[i]})
+                values.update({currentAttribute["name"]: attributes[i]})
             except IndexError:
-                values.update({required_attributes[i]["name"]: required_attributes[i]["default"]})
+                values.update({currentAttribute["name"]: currentAttribute["default"]})
+
+            # if the attribute has enumerate field, check it
+            if "enumerate" in currentAttribute and values[currentAttribute["name"]] not in currentAttribute["enumerate"]:
+                raise ValueError(f"error on line {line_number}: attribute {currentAttribute['name']} can't have the value {values[currentAttribute['name']]}")
         
         # ops that should not be translated directly
         if operation not in ["fi", "else", "endfor", "endwhile", "parameter", "function", "endfunction", "end"]:
