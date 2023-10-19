@@ -62,10 +62,12 @@ OPERATION_DECLARATIONS = {
             "name": "end"
         },
         {
-            "name": "direction"
+            "name": "direction",
+            "default": "inc"
         },
         {
-            "name": "step"
+            "name": "step",
+            "default": "1"
         }
     ],
     "endfor": [],
