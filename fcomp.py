@@ -22,12 +22,12 @@ OPERATION_DECLARATIONS = {
         },
         {
             "name": "type",
-            "enumerate": TYPES
+            "enum": TYPES
         },
         {
             "name": "array",
             "default": "False",
-            "enumerate": BOOLEANS
+            "enum": BOOLEANS
         },
         {
             "name": "size",
@@ -49,7 +49,7 @@ OPERATION_DECLARATIONS = {
         {
             "name": "newline",
             "default": "True",
-            "enumerate": BOOLEANS
+            "enum": BOOLEANS
         }
     ],
     "input": [
@@ -78,7 +78,7 @@ OPERATION_DECLARATIONS = {
         {
             "name": "direction",
             "default": "inc",
-            "enumerate": ["inc", "dec"]
+            "enum": ["inc", "dec"]
         },
         {
             "name": "step",
@@ -99,7 +99,7 @@ OPERATION_DECLARATIONS = {
         {
             "name": "type",
             "default": "None",
-            "enumerate": TYPES + ["None"]
+            "enum": TYPES + ["None"]
         },
         {
             "name": "variable",
@@ -116,7 +116,7 @@ OPERATION_DECLARATIONS = {
         {
             "name": "array",
             "default": "False",
-            "enumerate": BOOLEANS
+            "enum": BOOLEANS
         }
     ],
     "end": [],
@@ -226,8 +226,8 @@ with open(infile) as f:
             except IndexError:
                 values.update({currentAttribute["name"]: currentAttribute["default"]})
 
-            # if the attribute has enumerate field, check it
-            if "enumerate" in currentAttribute and values[currentAttribute["name"]] not in currentAttribute["enumerate"]:
+            # if the attribute has enum field, check it
+            if "enum" in currentAttribute and values[currentAttribute["name"]] not in currentAttribute["enum"]:
                 raise ValueError(f"error on line {line_number}: attribute {currentAttribute['name']} can't have the value {values[currentAttribute['name']]}")
         
         # ops that should not be translated directly
