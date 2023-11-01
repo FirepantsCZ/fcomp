@@ -154,29 +154,18 @@ with open(outfile, "w") as f:
     f.write(TEMPLATE)
 
 
-def parenthesis_split(sentence,separator=" ",lparen="(",rparen=")"):
-    nb_brackets=0
-    sentence = sentence.strip(separator) # get rid of leading/trailing seps
-
-    l=[0]
-    for i,c in enumerate(sentence):
-        if c==lparen:
-            nb_brackets+=1
-        elif c==rparen:
-            nb_brackets-=1
-        elif c==separator and nb_brackets==0:
-            l.append(i)
-        # handle malformed string
-        if nb_brackets<0:
-            raise Exception("Syntax error")
-
-    l.append(len(sentence))
-    # handle missing closing parentheses
-    if nb_brackets>0:
-        raise Exception("Syntax error")
-
-
-    return([sentence[i:j].strip(separator) for i,j in zip(l,l[1:])])
+def parenthesis_split(test_str):
+    test_str=test_str.replace("(","*(")
+    test_str=test_str.replace(")",")*")
+    x=test_str.split("*")
+    res=[]
+    for i in x:
+        if i.startswith("(") and i.endswith(")"):
+            res.append(i[1:-1])
+        else:
+            if i != "":
+                res.append(i)
+    return res
 
 
 class Operation:
@@ -201,20 +190,37 @@ with open(infile) as f:
     main_body = root.find("function").find("body")
     parent = main_body
 
-    for line_number, line in enumerate(user_input):
-        # we want line numbers to start at 1
+    tokens = []
+    operations = []
+    token_number = 0
+    line_number = 0
+    while line_number <= len(user_input)-1:
+
+        #TODO implement escapig characters
+        line = user_input[line_number]
+        #token = line.split()
+
+
+        group = line.strip("\n").split(";")
+        for operation in group:
+            if operation != "" and not operation.startswith("//"):
+                operations.append(operation.strip())
+
+        #tokens = parenthesis_split(line.strip())
         line_number += 1
 
-        line = parenthesis_split(line.strip())
-         
-        operation = line[0]
-        if operation.strip() == "" or operation.startswith("//"):
-            continue
+    for operation in operations:
+        #l = parenthesis_split()
+        print(operation)
+        operation = parenthesis_split(operation)
+        instruction = operation[0]
+        attributes = [val.strip() for val in "".join(operation[1:]).split(",")]
+        print(operation)
+        print(instruction)
+        print(attributes)
+        token = operation[0]
 
-
-        attributes = [e.strip() for e in line[1:]] 
-
-        required_attributes = OPERATION_DECLARATIONS[operation]
+        required_attributes = OPERATION_DECLARATIONS[instruction]
 
         values = {}
 
@@ -231,11 +237,15 @@ with open(infile) as f:
                 raise ValueError(f"error on line {line_number}: attribute {currentAttribute['name']} can't have the value {values[currentAttribute['name']]}")
         
         # ops that should not be translated directly
-        if operation not in ["fi", "else", "endfor", "endwhile", "parameter", "function", "endfunction", "end"]:
-            new_element = ET.Element(operation, values)
+        if instruction not in ["fi", "else", "parameter", "function", "end", "}", ";"]:
+            new_element = ET.Element(instruction, values)
             parent.append(new_element)
 
-        match operation:
+        match instruction:
+            case ";":
+
+                continue
+
             case "if":
                 parent = new_element
                 
@@ -261,17 +271,11 @@ with open(infile) as f:
                 else:
                     parent = parent.getparent()
 
-            case "endfor":
-                parent = parent.getparent()
-
             case "while":
                 parent = new_element
 
-            case "endwhile":
-                parent = parent.getparent()
-
             case "function":
-                new_element = ET.Element(operation, values)
+                new_element = ET.Element(instruction, values)
                 new_element.append(ET.Element("parameters"))
 
                 new_body = ET.Element("body")
@@ -280,10 +284,10 @@ with open(infile) as f:
                 root.append(new_element)
                 parent = new_body
 
-
-
             case "parameter":
-               parent.getparent().xpath("parameters")[0].append(ET.Element(operation, values))
+               parent.getparent().xpath("parameters")[0].append(ET.Element(instruction, values))
+
+        token_number += 1
 
     
     tree.write(outfile, pretty_print=True)

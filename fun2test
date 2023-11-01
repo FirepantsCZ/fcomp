@@ -1,0 +1,5 @@
+output("1", False); output("2");
+
+//ey comment
+
+output("3");
